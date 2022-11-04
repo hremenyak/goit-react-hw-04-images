@@ -1,13 +1,11 @@
 import BeatLoader from 'react-spinners/BeatLoader';
 
-const Loader = () => {
-  // const { isLoading } = this.props;
+const Loader = ({ loading }) => {
   return (
     <div>
       <BeatLoader
         color={'navy'}
-        loading={false}
-        // cssOverride={override}
+        loading={loading}
         size={10}
         aria-label="Loading Spinner"
         data-testid="loader"

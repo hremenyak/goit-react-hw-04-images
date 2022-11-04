@@ -1,12 +1,13 @@
-const ImageGalleryItem = ({ items }) => {
+import '../styles.css';
+const ImageGalleryItem = ({ item }) => {
   return (
-    <>
-      {items.map(item => (
-        <li className="gallery-item" key={item.url}>
-          <img src={items.url} alt={item.name} />
-        </li>
-      ))}
-    </>
+    <li className="ImageGalleryItem">
+      <img
+        src={item.webformatURL}
+        alt={item.tags}
+        className="ImageGalleryItem-image"
+      />
+    </li>
   );
 };
 
