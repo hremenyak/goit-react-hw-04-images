@@ -1,11 +1,40 @@
-const Modal = ({ item }) => {
-  return (
-    <div className="overlay">
-      <div className="modal">
-        <img src={item.link} alt={item.name} />
-      </div>
-    </div>
-  );
-};
+import { Component } from 'react';
+import { createPortal } from 'react-dom';
+import '../styles.css';
+
+const modalRoot = document.querySelector('#modal-root');
+
+class Modal extends Component {
+  closeByESC = e => {
+    if (e.code === 'Escape') {
+      this.props.closeModal();
+    }
+  };
+  componentDidMount() {
+    window.addEventListener('keydown', this.closeByESC);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.closeByESC);
+  }
+  render() {
+    const { modalImage, closeModal } = this.props;
+
+    return createPortal(
+      <div
+        className="Overlay"
+        onClick={e => {
+          if (e.target === e.currentTarget) {
+            closeModal();
+          }
+        }}
+      >
+        <div className="Modal">
+          <img src={modalImage} alt="" />
+        </div>
+      </div>,
+      modalRoot
+    );
+  }
+}
 
 export default Modal;

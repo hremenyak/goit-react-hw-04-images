@@ -6,7 +6,7 @@ const Loader = ({ loading }) => {
       <BeatLoader
         color={'navy'}
         loading={loading}
-        size={10}
+        size={15}
         aria-label="Loading Spinner"
         data-testid="loader"
       />
