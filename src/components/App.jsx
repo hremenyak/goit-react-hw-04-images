@@ -1,9 +1,8 @@
 import { Component } from 'react';
 import { GlobalStyle } from './GlobalStyle';
+import { fetchImages } from 'services/api';
 import SearchBar from './SearchBar';
-import { fetchImages } from 'api/api';
 import Loader from './Loader';
-
 import Button from './Button';
 import ImageGallery from './ImageGallery';
 import Modal from './Modal';
@@ -15,7 +14,9 @@ export class App extends Component {
     modalImage: '',
     isLoading: false,
     showModal: false,
+    totalHits: 0,
     page: 1,
+    error: null,
   };
 
   async componentDidUpdate(_, prevState) {
@@ -23,17 +24,29 @@ export class App extends Component {
 
     if (prevState.query !== query || prevState.page !== page) {
       this.setState({ isLoading: true });
-      const images = await fetchImages(query, page);
+      try {
+        const data = await fetchImages(query, page);
 
-      this.setState(state => ({
-        images: [...state.images, ...images],
-        isLoading: false,
-      }));
+        this.setState(state => ({
+          images: page === 1 ? [...data.hits] : [...state.images, ...data.hits],
+
+          totalHits:
+            page === 1
+              ? data.totalHits - data.hits.length
+              : data.totalHits - [...state.images, ...data.hits].length,
+        }));
+      } catch (error) {
+        this.setState({
+          error: 'Sorry... Seems like an error occured. Try again later.',
+        });
+      } finally {
+        this.setState({ isLoading: false });
+      }
     }
   }
 
   handleSubmit = query => {
-    this.setState({ query });
+    this.setState({ query, page: 1, images: [] });
   };
 
   loadMore = () => {
@@ -41,20 +54,23 @@ export class App extends Component {
   };
 
   toggleModal = modalImage => {
+    if (!modalImage) {
+      this.setState({ modalImage: '', showModal: false });
+      return;
+    }
     this.setState({ showModal: !this.state.showModal, modalImage });
   };
   render() {
+    const { images, isLoading, modalImage, showModal, totalHits } = this.state;
     return (
       <div>
         <SearchBar onSubmit={this.handleSubmit} />
-        <Loader loading={this.state.isLoading} />
-        <ImageGallery items={this.state.images} openModal={this.toggleModal} />
-        {!!this.state.images.length && <Button loadMore={this.loadMore} />}
-        {this.state.showModal && (
-          <Modal
-            modalImage={this.state.modalImage}
-            closeModal={this.toggleModal}
-          />
+        <ImageGallery items={images} openModal={this.toggleModal} />
+
+        <Loader loading={isLoading} />
+        {!!images.length && !!totalHits && <Button loadMore={this.loadMore} />}
+        {showModal && (
+          <Modal modalImage={modalImage} closeModal={this.toggleModal} />
         )}
         <GlobalStyle />
       </div>
