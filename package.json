@@ -2,7 +2,7 @@
   "name": "react-homework-template",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://hremenyak.github.io/goit-react-hw-03-image-finder/",
+  "homepage": "https://hremenyak.github.io/hremenyak/goit-react-hw-04-images/",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
