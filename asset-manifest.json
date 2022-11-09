@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/hremenyak/goit-react-hw-04-images/static/css/main.70d4d797.css",
+    "main.js": "/hremenyak/goit-react-hw-04-images/static/js/main.24e7dbee.js",
+    "index.html": "/hremenyak/goit-react-hw-04-images/index.html",
+    "main.70d4d797.css.map": "/hremenyak/goit-react-hw-04-images/static/css/main.70d4d797.css.map",
+    "main.24e7dbee.js.map": "/hremenyak/goit-react-hw-04-images/static/js/main.24e7dbee.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.70d4d797.css",
+    "static/js/main.24e7dbee.js"
+  ]
+}
