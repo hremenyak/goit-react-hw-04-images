@@ -42,6 +42,8 @@ export function reducer(state, { type, payload }) {
       });
       return { ...state, isLoading: false };
     default:
-      throw new Error('Oops, it seems like an error occurred.');
+      throw new Error(
+        'Oops, it seems like an error occurred. Try again later.'
+      );
   }
 }
