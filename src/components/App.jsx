@@ -1,49 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useReducer } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { nanoid } from 'nanoid';
 import { GlobalStyle } from './GlobalStyle';
 import { fetchImages } from 'services/api';
 import SearchBar from './SearchBar';
 import Loader from './Loader';
 import Button from './Button';
 import ImageGallery from './ImageGallery';
-import Modal from './Modal';
+import { reducer, ACTIONS } from '../helpers/reducer';
+
+const initialState = {
+  query: '',
+  images: [],
+  isLoading: false,
+  page: 1,
+  totalHits: 0,
+};
 
 export const App = () => {
-  const [query, setQuery] = useState('');
-  const [images, setImages] = useState([]);
-  const [modalImage, setModalImage] = useState('');
-  const [isLoading, setIsloading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [page, setPage] = useState(1);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { query, images, isLoading, page, totalHits } = state;
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsloading(true);
+      dispatch({ type: ACTIONS.FETCH_INIT });
 
       try {
-        const data = await fetchImages(query, page);
-        if (!data.hits.length) {
-          toast.warn('Sorry... we have not found any pictures.', {
+        const { hits, totalHits } = await fetchImages(query, page);
+        dispatch({ type: ACTIONS.FETCH_SUCCESS, payload: { hits, totalHits } });
+        if (!hits.length) {
+          toast.warn("Sorry... we haven't found any pictures.", {
             position: toast.POSITION.TOP_CENTER,
             autoClose: 3000,
+            toastId: nanoid(),
           });
         }
-        if (page === 1) {
-          setImages(data.hits);
-
-          return;
-        } else {
-          setImages(prevImages => [...prevImages, ...data.hits]);
-        }
-      } catch (e) {
-        toast.error('Oops... Something went wrong, try again later.', {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 3000,
-        });
-      } finally {
-        setIsloading(false);
+      } catch {
+        dispatch({ type: ACTIONS.FETCH_FAILURE });
       }
     };
     if (!query) {
@@ -54,109 +48,21 @@ export const App = () => {
   }, [page, query]);
 
   const handleSubmit = query => {
-    setQuery(query);
-    setPage(1);
-    setImages([]);
+    dispatch({ type: ACTIONS.SUBMIT, payload: query });
   };
 
   const loadMore = () => {
-    setPage(prevPage => prevPage + 1);
-  };
-
-  const toggleModal = modalImage => {
-    if (!modalImage) {
-      setModalImage('');
-      setIsModalOpen(false);
-
-      return;
-    }
-
-    setIsModalOpen(!isModalOpen);
-    setModalImage(modalImage);
+    dispatch({ type: ACTIONS.LOAD_MORE });
   };
 
   return (
     <div>
       <SearchBar onSubmit={handleSubmit} />
       <ToastContainer />
-      <ImageGallery items={images} openModal={toggleModal} />
+      <ImageGallery items={images} />
       <Loader loading={isLoading} />
-      {!!images.length && <Button loadMore={loadMore} />}
-      {isModalOpen && (
-        <Modal modalImage={modalImage} closeModal={toggleModal} />
-      )}
+      {totalHits > 0 && <Button loadMore={loadMore} />}
       <GlobalStyle />
     </div>
   );
 };
-
-// export class App extends Component {
-//   state = {
-//     query: '',
-//     images: [],
-//     modalImage: '',
-//     isLoading: false,
-//     showModal: false,
-//     totalHits: 0,
-//     page: 1,
-//     error: null,
-//   };
-
-//   async componentDidUpdate(_, prevState) {
-//     const { query, page } = this.state;
-
-//     if (prevState.query !== query || prevState.page !== page) {
-//       this.setState({ isLoading: true });
-//       try {
-//         const data = await fetchImages(query, page);
-
-//         this.setState(state => ({
-//           images: page === 1 ? [...data.hits] : [...state.images, ...data.hits],
-
-//           totalHits:
-//             page === 1
-//               ? data.totalHits - data.hits.length
-//               : data.totalHits - [...state.images, ...data.hits].length,
-//         }));
-//       } catch (error) {
-//         this.setState({
-//           error: 'Sorry... Seems like an error occured. Try again later.',
-//         });
-//       } finally {
-//         this.setState({ isLoading: false });
-//       }
-//     }
-//   }
-
-//   handleSubmit = query => {
-//     this.setState({ query, page: 1, images: [] });
-//   };
-
-//   loadMore = () => {
-//     this.setState(state => ({ page: state.page + 1 }));
-//   };
-
-//   toggleModal = modalImage => {
-//     if (!modalImage) {
-//       this.setState({ modalImage: '', showModal: false });
-//       return;
-//     }
-//     this.setState({ showModal: !this.state.showModal, modalImage });
-//   };
-//   render() {
-//     const { images, isLoading, modalImage, showModal, totalHits } = this.state;
-//     return (
-//       <div>
-//         <SearchBar onSubmit={this.handleSubmit} />
-//         <ImageGallery items={images} openModal={this.toggleModal} />
-
-//         <Loader loading={isLoading} />
-//         {!!images.length && !!totalHits && <Button loadMore={this.loadMore} />}
-//         {showModal && (
-//           <Modal modalImage={modalImage} closeModal={this.toggleModal} />
-//         )}
-//         <GlobalStyle />
-//       </div>
-//     );
-//   }
-// }

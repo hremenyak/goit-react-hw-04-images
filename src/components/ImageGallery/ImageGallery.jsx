@@ -19,5 +19,4 @@ export default ImageGallery;
 
 ImageGallery.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object),
-  openModal: PropTypes.func.isRequired,
 };

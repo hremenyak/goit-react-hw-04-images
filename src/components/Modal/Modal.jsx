@@ -5,7 +5,7 @@ import '../styles.css';
 
 const modalRoot = document.querySelector('#modal-root');
 
-const Modal = ({ closeModal, modalImage }) => {
+const Modal = ({ closeModal, modalImage, alt }) => {
   useEffect(() => {
     const closeByESC = e => {
       if (e.code === 'Escape') {
@@ -28,7 +28,7 @@ const Modal = ({ closeModal, modalImage }) => {
       }}
     >
       <div className="Modal">
-        <img src={modalImage} alt="" />
+        <img src={modalImage} alt={alt} />
       </div>
     </div>,
     modalRoot
@@ -39,5 +39,6 @@ export default Modal;
 
 Modal.propTypes = {
   modalImage: PropTypes.string,
-  closeModal: PropTypes.func,
+  alt: PropTypes.string.isRequired,
+  closeModal: PropTypes.func.isRequired,
 };
